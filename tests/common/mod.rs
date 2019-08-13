@@ -23,12 +23,10 @@ impl BitFlags {
 }
 
 pub fn new_mcp7940n(transactions: &[I2cTrans]) -> Mcp794xx<interface::I2cInterface<I2cMock>> {
-    Mcp794xx::new_mcp7940n(I2cMock::new(&transactions))
+    Mcp794xx::new(I2cMock::new(&transactions))
 }
 
-pub fn destroy_mcp7940n(dev: Mcp794xx<interface::I2cInterface<I2cMock>>) {
-    dev.destroy_mcp7940n().done();
-}
+pub fn destroy_mcp7940n(dev: Mcp794xx<interface::I2cInterface<I2cMock>>) {}
 
 #[macro_export]
 macro_rules! get_test {

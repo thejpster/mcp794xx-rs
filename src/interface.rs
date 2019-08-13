@@ -3,9 +3,9 @@ use super::{Error, DEVICE_ADDRESS};
 use hal::blocking;
 
 /// I2C interface
-#[derive(Debug, Default)]
-pub struct I2cInterface<I2C> {
-    pub(crate) i2c: I2C,
+#[derive(Debug)]
+pub struct I2cInterface<'a, I2C> {
+    pub(crate) i2c: &'a mut I2C,
 }
 
 /// Write data
@@ -15,10 +15,10 @@ pub trait WriteData {
     /// Write to an u8 register
     fn write_register(&mut self, register: u8, data: u8) -> Result<(), Self::Error>;
     /// Write data. The first element corresponds to the starting address.
-    fn write_data(&mut self, payload: &mut [u8]) -> Result<(), Self::Error>;
+    fn write_data(&mut self, payload: &[u8]) -> Result<(), Self::Error>;
 }
 
-impl<I2C, E> WriteData for I2cInterface<I2C>
+impl<'a, I2C, E> WriteData for I2cInterface<'a, I2C>
 where
     I2C: blocking::i2c::Write<Error = E>,
 {
@@ -31,7 +31,7 @@ where
             .map_err(Error::Comm)
     }
 
-    fn write_data(&mut self, payload: &mut [u8]) -> Result<(), Self::Error> {
+    fn write_data(&mut self, payload: &[u8]) -> Result<(), Self::Error> {
         self.i2c
             .write(DEVICE_ADDRESS, &payload)
             .map_err(Error::Comm)
@@ -48,7 +48,7 @@ pub trait ReadData {
     fn read_data(&mut self, payload: &mut [u8]) -> Result<(), Self::Error>;
 }
 
-impl<I2C, E> ReadData for I2cInterface<I2C>
+impl<'a, I2C, E> ReadData for I2cInterface<'a, I2C>
 where
     I2C: blocking::i2c::WriteRead<Error = E>,
 {
@@ -63,9 +63,8 @@ where
     }
 
     fn read_data(&mut self, payload: &mut [u8]) -> Result<(), Self::Error> {
-        let len = payload.len();
         self.i2c
-            .write_read(DEVICE_ADDRESS, &[payload[0]], &mut payload[1..len])
+            .write_read(DEVICE_ADDRESS, &[payload[0]], &mut payload[1..])
             .map_err(Error::Comm)
     }
 }

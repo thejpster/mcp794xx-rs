@@ -1,7 +1,7 @@
 extern crate embedded_hal_mock as hal;
 use hal::i2c::Transaction as I2cTrans;
 mod common;
-use common::{destroy_mcp7940n, new_mcp7940n, BitFlags, Register, DEVICE_ADDRESS as DEV_ADDR};
+use common::{new_mcp7940n, BitFlags, Register, DEVICE_ADDRESS as DEV_ADDR};
 
 macro_rules! call_update_method {
     ($name:ident, $method:ident, $register:ident, $value:expr) => {
