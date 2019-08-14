@@ -54,16 +54,20 @@ pub mod interface;
 use interface::I2cInterface;
 mod common;
 
-impl<'a, I2C, E> Mcp794xx<I2cInterface<'a, I2C>>
+impl<I2C, E> Mcp794xx<I2cInterface<I2C>>
 where
     I2C: hal::blocking::i2c::Write<Error = E> + hal::blocking::i2c::WriteRead<Error = E>,
 {
     /// Create a new instance of the MCP7940N device.
-    pub fn new(i2c: &'a mut I2C) -> Self {
+    pub fn new_mcp7940n(i2c: I2C) -> Self {
         Mcp794xx {
             iface: I2cInterface { i2c },
             is_enabled: false,
         }
+    }
+    /// Destroy driver instance, return I²C bus instance.
+    pub fn destroy_mcp7940n(self) -> I2C {
+        self.iface.i2c
     }
 }
 
@@ -142,7 +146,7 @@ mod private {
     use super::interface;
     pub trait Sealed {}
 
-    impl<'a, E> Sealed for interface::I2cInterface<'a, E> {}
+    impl<E> Sealed for interface::I2cInterface<E> {}
     impl<E> Sealed for dyn interface::ReadData<Error = E> {}
     impl<E> Sealed for dyn interface::WriteData<Error = E> {}
 }

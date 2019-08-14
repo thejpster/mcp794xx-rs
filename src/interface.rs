@@ -4,8 +4,8 @@ use hal::blocking;
 
 /// I2C interface
 #[derive(Debug)]
-pub struct I2cInterface<'a, I2C> {
-    pub(crate) i2c: &'a mut I2C,
+pub struct I2cInterface<I2C> {
+    pub(crate) i2c: I2C,
 }
 
 /// Write data
@@ -18,7 +18,7 @@ pub trait WriteData {
     fn write_data(&mut self, payload: &[u8]) -> Result<(), Self::Error>;
 }
 
-impl<'a, I2C, E> WriteData for I2cInterface<'a, I2C>
+impl<I2C, E> WriteData for I2cInterface<I2C>
 where
     I2C: blocking::i2c::Write<Error = E>,
 {
@@ -48,7 +48,7 @@ pub trait ReadData {
     fn read_data(&mut self, payload: &mut [u8]) -> Result<(), Self::Error>;
 }
 
-impl<'a, I2C, E> ReadData for I2cInterface<'a, I2C>
+impl<I2C, E> ReadData for I2cInterface<I2C>
 where
     I2C: blocking::i2c::WriteRead<Error = E>,
 {
